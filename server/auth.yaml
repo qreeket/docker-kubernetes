@@ -2,23 +2,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: qwallet-core
-  namespace: qwallet
+  name: qreeket-auth
+  namespace: qreeket
   labels:
     app: backend-core
 spec:
   selector:
     matchLabels:
-      app: qwallet-core
+      app: qreeket-auth
   replicas: 1
   template:
     metadata:
       labels:
-        app: qwallet-core
+        app: qreeket-auth
     spec:
       containers:
-        - name: qwallet-core
-          image: qcodelabsllc/qwallet-core-api:latest
+        - name: qreeket-auth
+          image: qcodelabsllc/qreeket-auth-api:latest
           imagePullPolicy: Always
           env:
             - name: API_VERSION
@@ -59,13 +59,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: qwallet-core-svc
-  namespace: qwallet
+  name: qreeket-auth-svc
+  namespace: qreeket
   labels:
     app: backend-core
 spec:
   selector:
-    app: qwallet-core
+    app: qreeket-auth
   ports:
     - name: grpc
       port: 443
