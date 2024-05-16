@@ -1,0 +1,31 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-grpc
+  namespace: qwallet
+  labels:
+    app: delivery
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  tls:
+    - hosts:
+        - "*.qwallet.qcodelabsllc.com"
+      secretName: ingress-grpc-tls
+  ingressClassName: nginx
+  rules:
+    - host: server.qwallet.qcodelabsllc.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: qwallet-core-svc
+                port:
+                  name: grpc
+---

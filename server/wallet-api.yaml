@@ -1,0 +1,72 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qwallet-core
+  namespace: qwallet
+  labels:
+    app: backend-core
+spec:
+  selector:
+    matchLabels:
+      app: qwallet-core
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: qwallet-core
+    spec:
+      containers:
+        - name: qwallet-core
+          image: qcodelabsllc/qwallet-core-api:latest
+          imagePullPolicy: Always
+          env:
+            - name: API_VERSION
+              value: "v0.0.0-alpha"
+            - name: GRPC_SERVER_PORT
+              value: "443"
+            - name: ENV
+              value: "prod"
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: username
+            - name: DB_PWD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: password
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: database
+            - name: REDIS_PWD
+              valueFrom:
+                secretKeyRef:
+                  name: redis-credentials
+                  key: authKey
+            - name: TOKEN_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: server-credentials
+                  key: token_secret
+          ports:
+            - name: grpc
+              containerPort: 9988
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: qwallet-core-svc
+  namespace: qwallet
+  labels:
+    app: backend-core
+spec:
+  selector:
+    app: qwallet-core
+  ports:
+    - name: grpc
+      port: 443
+      targetPort: grpc
